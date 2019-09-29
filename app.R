@@ -11,6 +11,9 @@ source("trading/lasso_training.R")
 source("trading/ridge_training.R")
 source("trading/2018.R")
 source("machine-learning/returns.R")
+source("generate-data/generate_all.R")
+
+generate() #generates data
 
 library(ggplot2)  # for the diamonds dataset
 
