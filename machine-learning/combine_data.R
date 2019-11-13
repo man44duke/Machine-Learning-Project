@@ -3,6 +3,8 @@ library(boot)
 library(caret)
 
 source("machine-learning/returns.R")
+vol <- readRDS("RData/vol.RDS")
+prices <- readRDS("RData/prices.RDS")
 
 #Note: if the type is something execpt for "NULL" then the function returns a binary (up/down) value
 combine_data <- function(prices, type=NULL, backtest = FALSE, samples = NULL){

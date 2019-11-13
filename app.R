@@ -1,4 +1,4 @@
-rm(list=ls())
+#rm(list=ls())
 
 library(tibble)
 library(shiny)
@@ -11,9 +11,13 @@ source("trading/lasso_training.R")
 source("trading/ridge_training.R")
 source("trading/2018.R")
 source("machine-learning/returns.R")
-source("generate-data/generate_all.R")
+#source("generate-data/generate_all.R")
 
-generate() #generates data
+#generate() #generates data
+
+vol <- readRDS("RData/vol.RDS")
+prices <- readRDS("RData/prices.RDS")
+
 
 library(ggplot2)  # for the diamonds dataset
 
