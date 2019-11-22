@@ -4,7 +4,7 @@ source("machine-learning/combine_data.R")
 
 linear_regression <- function(prices){
  
-  values <- combine_data(prices, backtest = TRUE, sample = "train")
+  values <- combine_data(prices)
   xs <- values[,-1]
   y <- values[,1]
   

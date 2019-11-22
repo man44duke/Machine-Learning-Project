@@ -15,12 +15,15 @@ combine_data <- function(prices, type=NULL, backtest = FALSE, samples = NULL){
     binary <- lapply(vix_returns, function(x) as.numeric(x > 0))[[1]]
     coredata(vix_returns) <- binary
   }
-  
+
   vix_vol <- vol$SPY[[1]]
   #vix_vol <- prices$RF
-  
-  for (x in vol$SPY){
+  name <- paste(names(vol$SPY[[1]]), ".", names(vol$SPY[1]), sep ="")
+  i = 2
+  for (x in vol$SPY[2:6]){
     vix_vol <- merge(vix_vol, x, join = "inner")
+    name <- c(name, paste(names(vol$SPY[[i]]), ".", names(vol$SPY[i]), sep =""))
+    i = i+1
   }
   
   vix_vol <- align.time(vix_vol,n=86400)
@@ -37,19 +40,21 @@ combine_data <- function(prices, type=NULL, backtest = FALSE, samples = NULL){
   values <- merge(vix_returns, vix_vol, join = "inner")
   
   if(backtest){
-    smp_size <- floor(.35 * nrow(values))
-    set.seed(123)
-    sample <- sample.int(n=nrow(values), size = smp_size, replace = F)
-    if(samples == "test"){
-      test <- values[-sample,]
-      return(test)
-    }
+    
     if(samples == "train"){
-      train <- values[sample,]
-      return(train)
+      test <- values["/2016"]
+      values = test
+    }
+    if(samples == "test"){
+      train <- values["2017"]
+      values = train
     }
     
   }
-  values
+  
+  names <- c("vix_return", rev(names(prices)),name)
+  
+  colnames(values) = c(names)
+  return(values)
   
 }
