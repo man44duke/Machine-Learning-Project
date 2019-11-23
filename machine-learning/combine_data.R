@@ -45,8 +45,12 @@ combine_data <- function(prices, type=NULL, backtest = FALSE, samples = NULL){
       test <- values["/2016"]
       values = test
     }
-    if(samples == "test"){
+    if(samples == "2017"){
       train <- values["2017"]
+      values = train
+    }
+    if(samples == "2018"){
+      train <- values["2018"]
       values = train
     }
     
