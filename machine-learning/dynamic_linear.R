@@ -1,5 +1,9 @@
 library(dynlm)
 library(zoo)
+library(tidyverse)
+library(caret)
+library(leaps)
+library(MASS)
 
 source("machine-learning/combine_data.R")
 source("machine-learning/test_error.R")
@@ -9,8 +13,15 @@ dynamic_linear <- function(prices, backtest = FALSE, sample = NULL){
   values <- combine_data(prices, backtest = backtest, samples = sample)
   xs <- values[,-1]
   y <- values[,1]
+  linear.fit <- lm(vix_return ~ .,  data = values)
+  stepwise <- stepAIC(linear.fit, direction = "both", trace = FALSE)
   
-  dlm.fit <- dynlm(vix_return ~ L(vix_return, seq(1,10)) + L(VIX, 1) + trend(vix_return) +., data = values )
+  step.coefs <- names(stepwise$coefficients)[-1]
+  coefs <- gsub("`", "", step.coefs)
+  coefs <- c("vix_return" , coefs)
+  values.subset <- subset(values, select = coefs)
+  
+  dlm.fit <- dynlm(vix_return ~ L(vix_return, seq(1,10)) + L(VIX, 1) + ., data = values.subset )
   return(dlm.fit)
 }
 
@@ -25,11 +36,20 @@ if(FALSE){
   values.train <- combine_data(prices, backtest = TRUE, samples = "train")
   values.2017 <- combine_data(prices, backtest = TRUE, samples = "train")
   
-  dlm.fit1 <- dynlm(vix_return ~ ., data = values.train[-seq(10),] )
-  dlm.fit2 <- dynlm(vix_return ~ L(vix_return, seq(1,5)) + ., data = values.train[-seq(5),] )
-  dlm.fit3 <- dynlm(vix_return ~ L(vix_return, seq(1,5)) + L(VIX, 1) + ., data = values.train[-seq(5),] )
-  dlm.fit4 <- dynlm(vix_return ~ L(vix_return, seq(1,10)) + L(VIX, 1) + ., data = values.train )
-  dlm.fit5 <- dynlm(vix_return ~ L(vix_return, seq(1,10)) + L(VIX, 1) + trend(vix_return) + ., data = values.train )
+  linear.fit <- lm(vix_return ~ .,  data = values.train)
+  stepwise <- stepAIC(linear.fit, direction = "both", trace = FALSE)
+  summary(stepwise)
+  
+  step.coefs <- names(stepwise$coefficients)[-1]
+  coefs <- gsub("`", "", step.coefs)
+  coefs <- c("vix_return" , coefs)
+  values.subset <- subset(values, select = coefs)
+  
+  dlm.fit1 <- dynlm(vix_return ~ ., data = values.subset[-seq(10),])
+  dlm.fit2 <- dynlm(vix_return ~ L(vix_return, seq(1,5)) + ., data = values.subset[-seq(5),] )
+  dlm.fit3 <- dynlm(vix_return ~ L(vix_return, seq(1,5)) + L(VIX, 1) + ., data = values.subset[-seq(5),] )
+  dlm.fit4 <- dynlm(vix_return ~ L(vix_return, seq(1,10)) + L(VIX, 1) + ., data = values.subset )
+  dlm.fit5 <- dynlm(vix_return ~ L(vix_return, seq(1,10)) + L(VIX, 1) + trend(vix_return) + ., data = values.subset )
   
   pred.fit1 <- predict(dlm.fit1, newdata = values.2017)
   pred.fit2 <- predict(dlm.fit2, newdata = values.2017)
