@@ -9,11 +9,10 @@ source("trading/linear_training.R")
 source("trading/logit_training.R")
 source("trading/lasso_training.R")
 source("trading/ridge_training.R")
+source("trading/dynamic_linear_training.R")
 source("trading/2018.R")
 source("machine-learning/returns.R")
-#source("generate-data/generate_all.R")
 
-#generate() #generates data
 
 vol <- readRDS("RData/vol.RDS")
 prices <- readRDS("RData/prices.RDS")
@@ -64,7 +63,7 @@ ui <- fluidPage(
             sliderInput("capitalAllocation", "Capital Allocation %:",
                         width = "100%",
                         min = 0, max = 100,
-                        value = 50),
+                        value = 10),
             
             h3("Comparison of Returns"),
             DT::dataTableOutput("dataTable"),
@@ -104,7 +103,7 @@ server <- function(input, output, session) {
   ####COMMON VARIABLES AND CONFIGURATION
   ##########################################
   years <- c("2005", "2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018")
-  algos <- c("Linear Regression", "Logit", "Lasso", "Ridge")
+  algos <- c("Linear Regression", "Logit", "Lasso", "Ridge", "Dynamic Linear")
   
   observe({
     updateSelectInput(session, "algo", choices = algos)
@@ -234,6 +233,11 @@ server <- function(input, output, session) {
     }
     else if(algo == "Ridge"){
       ridge_trading(prices)
+    }
+    else if(algo == "Dynamic Linear"){
+      #slow to fit so just feed it in
+      dlm <- readRDS("RData/dlm_fit.RDS")
+      #dynamic_linear_trading(prices)
     }
     else if(algo == "SPY"){
       spy_prices <- prices[["SPY"]]

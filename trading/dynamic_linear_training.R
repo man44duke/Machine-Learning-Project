@@ -30,8 +30,8 @@ if(FALSE){
   load("~/Financial Infromatics/barracuda/barracuda.package/barracuda.package/data/vol.rda")
   data <- dlm_trading(prices)
   
-  mean <- sum(data["2017"]*.1)
-  sd <- sd(data["2017"]*.1*sqrt(250))
+  mean <- sum(data["2018"]*.1)
+  sd <- sd(data["2018"]*.1*sqrt(250))
   
   sharpe <- (mean-.02)/sd
   ############
