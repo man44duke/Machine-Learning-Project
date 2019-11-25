@@ -89,9 +89,9 @@ ui <- fluidPage(
                 h4("Trade Returns Histogram"),
                 plotOutput("TradeHistBacktest"),
                 h4("Trade Returns Over Time"),
-                plotlyOutput("ReturnslPlotBacktest"),
-                h4("Benchmark Plot"),
-                plotOutput('BenchmarkPlotBacktest')
+                plotlyOutput("ReturnslPlotBacktest")
+                #h4("Benchmark Plot"),
+                #plotOutput('BenchmarkPlotBacktest')
         )
    )
 )
@@ -246,6 +246,33 @@ server <- function(input, output, session) {
     }
   }
   
+  
+  # getYearReturns <- function(algo, year){
+  #   if(algo == "Linear Regression"){
+  #     linear_trading(prices)[year]
+  #   }
+  #   else if(algo == "Logit"){
+  #     logit_trading(prices)[year]
+  #   }
+  #   else if(algo == "Lasso"){
+  #     lasso_trading(prices)[year]
+  #   }
+  #   else if(algo == "Ridge"){
+  #     ridge_trading(prices)[year]
+  #   }
+  #   else if(algo == "Dynamic Linear"){
+  #     #slow to fit so just feed it in
+  #     dlm <- readRDS("RData/dlm_fit.RDS")
+  #     dlm[year]
+  #     #dynamic_linear_trading(prices)
+  #   }
+  #   else if(algo == "SPY"){
+  #     spy_prices <- prices[["SPY"]]
+  #     
+  #     returns("SPY", prices)
+  #   }
+  # }
+  
   output$TradeHist <- renderPlot({
     algo <- input$algo
     returns <- getReturns(algo)
@@ -351,39 +378,47 @@ server <- function(input, output, session) {
   #### DATA TABLE
   #### #### #### ####
   calc_avg_return <- function(algo){
-    val <- sapply(data.frame(getReturnsYearly(algo)), mean)
+    values <- getReturns(algo)["2017"]
+    val <- sum(values)*input$capitalAllocation
     val <- format(round(val, 2), nsmall = 2)
     
     paste0(formatC(val, format = "f", digits = 2), "%")
   }
   
   calc_avg_std_dev <- function(algo){
-    val <- sapply(data.frame(getStdevYearly(algo)), mean)
+    values <- getReturns(algo)["2017"]
+    num <- length(values)
+    val <- sd(values)*input$capitalAllocation*sqrt(num)
     format(round(val, 2), nsmall = 2)
   }
   
   calc_avg_sharpe <- function(algo){
-    val <- sapply(data.frame(getSharpeYearly(algo)), mean)
+    values <- getReturns(algo)["2017"]
+    num <- length(values)
+    sd <- sd(values)*input$capitalAllocation*sqrt(num)
+    mean <- sum(values)*input$capitalAllocation
+    
+    val <- (mean-.02)/sd
     format(round(val, 2), nsmall = 2)
   }
 
   output$dataTable <- DT::renderDataTable({
     
-    avg_return <- c()
-    avg_std_dev <- c()
-    avg_sharpe <- c()
+    Return_2017 <- c()
+    Std_Dev_2017 <- c()
+    Sharpe_2017 <- c()
     
     for(x in algos){
-      avg_return <- c(avg_return, calc_avg_return(x))
-      avg_std_dev <- c(avg_std_dev, calc_avg_std_dev(x))
-      avg_sharpe <- c(avg_sharpe, calc_avg_sharpe(x))
+      Return_2017 <- c(Return_2017, calc_avg_return(x))
+      Std_Dev_2017 <- c(Std_Dev_2017, calc_avg_std_dev(x))
+      Sharpe_2017 <- c(Sharpe_2017, calc_avg_sharpe(x))
     }
     
     frame <- data.frame(
-      algorithm = algos,
-      avg_return,
-      avg_std_dev,
-      avg_sharpe,
+      Algorithm = algos,
+      Return_2017,
+      Std_Dev_2017,
+      Sharpe_2017,
       stringsAsFactors = FALSE
     )
     

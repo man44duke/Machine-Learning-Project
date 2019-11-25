@@ -28,10 +28,12 @@ dlm_trading <- function(prices){
 if(FALSE){
   load("~/Financial Infromatics/barracuda/barracuda.package/barracuda.package/data/prices.rda")
   load("~/Financial Infromatics/barracuda/barracuda.package/barracuda.package/data/vol.rda")
-  data <- dlm_trading(prices)
+  dlm.fit <- dlm_trading(prices)
   
-  mean <- sum(data["2018"]*.1)
-  sd <- sd(data["2018"]*.1*sqrt(250))
+  saveRDS(dlm.fit, file = "RData/dlm_fit.RDS")
+  
+  mean <- sum(data["2017"]*.1)
+  sd <- sd(data["2017"]*.1*sqrt(250))
   
   sharpe <- (mean-.02)/sd
   ############
