@@ -6,7 +6,7 @@ source("machine-learning/combine_data.R")
 
 lasso_trading <- function(prices){
   lasso <- lasso(prices)
-  values <- combine_data(prices, backtest = TRUE, sample = "test")
+  values <- combine_data(prices)
   data <- values
   data <- data[,-1]
   vix_returns <- values[,1]

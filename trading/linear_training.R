@@ -8,7 +8,7 @@ linear_trading <- function(prices){
   coeffs <- lr$coefficients
   coeffs[is.na(coeffs)] <- 0
   coeffs <- as.matrix(coeffs)
-  values <- combine_data(prices, backtest = TRUE, sample = "test")
+  values <- combine_data(prices)
   data <- values
   data[,1] <- 1
   vix_returns <- values[,1]

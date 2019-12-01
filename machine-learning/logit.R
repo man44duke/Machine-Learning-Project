@@ -3,11 +3,11 @@ source("machine-learning/combine_data.R")
 
 logit <- function(prices){
   
-  values <- combine_data(prices, "binary")
+  values <- combine_data(prices, "binary", backtest = TRUE, samples = "train")
   xs <- values[,-1]
   y <- values[,1]
   
-  fit <- glm(coredata(y) ~ coredata(xs), family = binomial(link = "logit"))
+  fit <- glm(coredata(y) ~ coredata(xs), family = binomial)
 }
 
 

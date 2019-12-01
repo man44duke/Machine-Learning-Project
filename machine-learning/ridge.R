@@ -5,7 +5,7 @@ source("machine-learning/combine_data.R")
 
 ridge <- function(prices){
   
-  values <- combine_data(prices)
+  values <- combine_data(prices, backtest = TRUE, samples = "train")
   xs <- values[,-1]
   y <- values[,1]
   lambdas <- 10^seq(3, -2, by = -.1)

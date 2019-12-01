@@ -8,7 +8,7 @@ ridge_trading <- function(prices){
   ridge <- ridge(prices)
   opt <- ridge$lambda.min
   fit <- ridge$glmnet.fit
-  values <- combine_data(prices, backtest = TRUE, sample = "test")
+  values <- combine_data(prices)
   data <- values
   data <- data[,-1]
   vix_returns <- values[,1]

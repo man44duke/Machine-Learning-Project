@@ -10,7 +10,7 @@ source("trading/logit_training.R")
 source("trading/lasso_training.R")
 source("trading/ridge_training.R")
 source("trading/dynamic_linear_training.R")
-source("trading/2018.R")
+#source("trading/2018.R")
 source("machine-learning/returns.R")
 
 
@@ -85,7 +85,7 @@ ui <- fluidPage(
                 sliderInput("capitalAllocation2018", "Capital Allocation %:",
                             width = "100%",
                             min = 0, max = 100,
-                            value = 50),
+                            value = 10),
                 h4("Trade Returns Histogram"),
                 plotOutput("TradeHistBacktest"),
                 h4("Trade Returns Over Time"),
@@ -226,7 +226,8 @@ server <- function(input, output, session) {
       linear_trading(prices)
     }
     else if(algo == "Logit"){
-      logit_trading(prices)
+      logit_trading(prices)*.99
+      #logit <- readRDS("RData/logit_fit.RDS")
     }
     else if(algo == "Lasso"){
       lasso_trading(prices)
@@ -437,7 +438,7 @@ server <- function(input, output, session) {
   ##########################################
   output$TradeHistBacktest <- renderPlot({
     
-    Returns <- linear_trading2018(prices) 
+    Returns <- getReturns("Dynamic Linear")["2018"] 
     
     Returns <- Returns*input$capitalAllocation2018
     
@@ -446,7 +447,7 @@ server <- function(input, output, session) {
   
   output$ReturnslPlotBacktest <- renderPlotly({
     
-    data <- data.frame(linear_trading2018(prices))
+    data <- data.frame(getReturns("Dynamic Linear")["2018"] )
     data <- data*input$capitalAllocation2018
     
     plot_ly(data, x= ~rownames(data), y= ~data[[1]], type = 'scatter', mode = 'lines') %>%
@@ -457,76 +458,76 @@ server <- function(input, output, session) {
   #### BENCHMARK PLOT (Code modified from that provided by Jacob Vestal's make-benchmark-plot.R; availible at https://gitlab.oit.duke.edu/jmv13/problem-set-2-solution)
   #### #### #### ####
   
-  output$BenchmarkPlotBacktest <- renderPlot({
-    
-    spy_returns <- getReturns("SPY")["2018"]
-    barracuda_returns <- linear_trading2018(prices)
-    
-    time_basis <- "Daily"
-    
-    benchmark_data <- merge(
-      spy_returns,
-      barracuda_returns,
-      join = 'inner'
-    ) %>% 
-      coredata() %>%
-      as_tibble() %>%
-      set_colnames(c("x", "y"))
-    
-    lm_for_trendline <- lm(benchmark_data$y ~ benchmark_data$x)
-    
-    ggplot(
-      data = benchmark_data
-    ) +
-      geom_point(
-        mapping = aes(
-          x = x,
-          y = y
-        )
-      ) +
-      xlab(
-        paste0(
-          time_basis,
-          " return for S&P500 (SPY) "
-        )
-      ) +
-      ylab(
-        paste0(
-          time_basis,
-          " return for Barracuda "
-        )
-      ) + 
-      geom_abline(
-        slope     = lm_for_trendline$coefficients[2],
-        intercept = lm_for_trendline$coefficients[1],
-        linetype  = "longdash", 
-        color     = "#d15c79", 
-        size      = 2
-      ) + 
-      geom_label(
-        data = tibble(
-          xpos = -Inf,
-          ypos =  Inf,
-          annotateText = paste0(
-            "α = ",
-            round(
-              lm_for_trendline$coefficients[2], 
-              digits = 3
-            ),
-            "; β = ",
-            round(
-              lm_for_trendline$coefficients[1], 
-              digits = 3
-            )
-          ),
-          hjustvar = "inward",
-          vjustvar = "inward"
-        ),
-        aes(x=xpos,y=ypos,hjust=hjustvar,vjust=vjustvar,label=annotateText)
-      )
-    
-  })
-}
+#   output$BenchmarkPlotBacktest <- renderPlot({
+#     
+#     spy_returns <- getReturns("SPY")["2018"]
+#     barracuda_returns <- linear_trading2018(prices)
+#     
+#     time_basis <- "Daily"
+#     
+#     benchmark_data <- merge(
+#       spy_returns,
+#       barracuda_returns,
+#       join = 'inner'
+#     ) %>% 
+#       coredata() %>%
+#       as_tibble() %>%
+#       set_colnames(c("x", "y"))
+#     
+#     lm_for_trendline <- lm(benchmark_data$y ~ benchmark_data$x)
+#     
+#     ggplot(
+#       data = benchmark_data
+#     ) +
+#       geom_point(
+#         mapping = aes(
+#           x = x,
+#           y = y
+#         )
+#       ) +
+#       xlab(
+#         paste0(
+#           time_basis,
+#           " return for S&P500 (SPY) "
+#         )
+#       ) +
+#       ylab(
+#         paste0(
+#           time_basis,
+#           " return for Barracuda "
+#         )
+#       ) + 
+#       geom_abline(
+#         slope     = lm_for_trendline$coefficients[2],
+#         intercept = lm_for_trendline$coefficients[1],
+#         linetype  = "longdash", 
+#         color     = "#d15c79", 
+#         size      = 2
+#       ) + 
+#       geom_label(
+#         data = tibble(
+#           xpos = -Inf,
+#           ypos =  Inf,
+#           annotateText = paste0(
+#             "α = ",
+#             round(
+#               lm_for_trendline$coefficients[2], 
+#               digits = 3
+#             ),
+#             "; β = ",
+#             round(
+#               lm_for_trendline$coefficients[1], 
+#               digits = 3
+#             )
+#           ),
+#           hjustvar = "inward",
+#           vjustvar = "inward"
+#         ),
+#         aes(x=xpos,y=ypos,hjust=hjustvar,vjust=vjustvar,label=annotateText)
+#       )
+#     
+#   })
+ }
 
 # Run the application 
 

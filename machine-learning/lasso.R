@@ -5,11 +5,11 @@ source("machine-learning/combine_data.R")
 
 lasso <- function(prices){
   
-  values <- combine_data(prices)
+  values <- combine_data(prices, backtest = TRUE, samples = "train")
   xs <- values[,-1]
   y <- values[,1]
   
-  fit <- glmnet(y = coredata(y), x=coredata(xs))
+  fit <- glmnet(y = coredata(y),  x = coredata(xs))
 }
 
 
