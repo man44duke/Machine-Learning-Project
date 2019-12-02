@@ -10,6 +10,7 @@ source("trading/logit_training.R")
 source("trading/lasso_training.R")
 source("trading/ridge_training.R")
 source("trading/dynamic_linear_training.R")
+source("trading/random_forest_training.R")
 #source("trading/2018.R")
 source("machine-learning/returns.R")
 
@@ -24,7 +25,7 @@ library(ggplot2)  # for the diamonds dataset
 ui <- fluidPage(
    
    # Application title
-   titlePanel("Barracuda"),
+   titlePanel("Vol on Vol"),
    
    tabsetPanel(
        tabPanel("Volatility Surface", 
@@ -103,7 +104,7 @@ server <- function(input, output, session) {
   ####COMMON VARIABLES AND CONFIGURATION
   ##########################################
   years <- c("2005", "2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018")
-  algos <- c("Linear Regression", "Logit", "Lasso", "Ridge", "Dynamic Linear")
+  algos <- c("Linear Regression", "Logit", "Lasso", "Ridge", "Dynamic Linear", "Random Forest")
   
   observe({
     updateSelectInput(session, "algo", choices = algos)
@@ -234,6 +235,9 @@ server <- function(input, output, session) {
     }
     else if(algo == "Ridge"){
       ridge_trading(prices)
+    }
+    else if(algo == "Random Forest"){
+      rf <- readRDS("RData/rf_fit.RDS")
     }
     else if(algo == "Dynamic Linear"){
       #slow to fit so just feed it in
